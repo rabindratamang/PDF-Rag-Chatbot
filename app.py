@@ -39,3 +39,16 @@ st.set_page_config(page_title="PDF RAG Chatbot", layout="centered")
 st.title("chat with your PDF (RAG)")
 
 uploaded_file = st.file_uploader("Upload a PDF", type="pdf")
+
+if uploaded_file:
+    with st.spinner("Reading and indexing PDF..."):
+        raw_text = extract_text_from_pdf(uploaded_file)
+        chunks = split_text(raw_text)
+        vectorstore = create_vectorstore(chunks)
+        qa_chain = create_qa_chain(vectorstore)
+    st.success("PDF loaded and ready!")
+
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+
+    query = st.text_input("Ask a question about the PDF")
