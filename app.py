@@ -36,7 +36,7 @@ def create_qa_chain(vectorstore):
 
 
 st.set_page_config(page_title="PDF RAG Chatbot", layout="centered")
-st.title("chat with your PDF (RAG)")
+st.title("Chat with your PDF (RAG)")
 
 uploaded_file = st.file_uploader("Upload a PDF", type="pdf")
 
@@ -51,4 +51,15 @@ if uploaded_file:
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
 
-    query = st.text_input("Ask a question about the PDF")
+    query = st.chat_input("Ask a question about the PDF")
+    if query:
+        with st.spinner("Getting answer..."):
+            result = qa_chain.run(query)
+        st.session_state.chat_history.append(("You", query))
+        st.session_state.chat_history.append(("Bot", result))
+
+    for speaker, msg in st.session_state.chat_history:
+        if(speaker == "You"):
+            st.chat_message("user").write(msg)
+        else:
+            st.chat_message("ai").write(msg)
